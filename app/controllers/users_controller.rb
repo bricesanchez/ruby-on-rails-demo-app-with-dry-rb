@@ -1,4 +1,6 @@
 class UsersController < ApplicationController
+  include Dry::Monads[:result]
+
   before_action :set_user, only: [:show, :edit, :update, :destroy]
 
   # GET /users
@@ -21,19 +23,17 @@ class UsersController < ApplicationController
   def edit
   end
 
-  # POST /users
-  # POST /users.json
   def create
-    @user = User.new(user_params)
+    create_user = ::Users::CreateUser.new.call(user_params.to_h)
 
-    respond_to do |format|
-      if @user.save
-        format.html { redirect_to @user, notice: 'User was successfully created.' }
-        format.json { render :show, status: :created, location: @user }
-      else
-        format.html { render :new }
-        format.json { render json: @user.errors, status: :unprocessable_entity }
-      end
+    case create_user
+    in Success(result)
+      redirect_to users_path, notice: 'User was successfully created.'
+    in Failure(result)
+      flash.now[:alert] = 'User was not created.'
+      @errors = result.errors.to_h
+      @user = User.new(user_params)
+      render :new
     end
   end
 
