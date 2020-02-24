@@ -1,3 +1,7 @@
+# frozen_string_literal: true
+
+require 'dry/monads'
+
 class UsersController < ApplicationController
   include Dry::Monads[:result]
 
@@ -28,6 +32,9 @@ class UsersController < ApplicationController
 
     case create_user
     in Success(result)
+      application_events.subscribe(::Users::CreateUserListener.new)
+      application_events.publish('users.created', user: result)
+
       redirect_to users_path, notice: 'User was successfully created.'
     in Failure(result)
       flash.now[:alert] = 'User was not created.'

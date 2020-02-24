@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'dry-validation'
+require 'dry/validation/contract'
 
 class BaseContract < Dry::Validation::Contract
   Dry::Validation.load_extensions(:monads)
