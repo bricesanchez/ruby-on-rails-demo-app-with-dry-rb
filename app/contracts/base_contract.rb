@@ -15,7 +15,7 @@ class BaseContract < Dry::Validation::Contract
     attr_name = macro.args[0]
 
     unless record.class.where.not(id: record.id).where(attr_name => value).empty?
-      key.failure("must be unique")
+      key.failure('must be unique')
     end
   end
 end

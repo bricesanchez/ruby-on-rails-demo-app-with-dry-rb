@@ -1,0 +1,39 @@
+language: ruby
+
+dist: bionic
+
+sudo: false
+
+addons:
+  postgresql: '10'
+
+cache:
+  bundler: true
+  directories:
+    - node_modules
+  yarn: true
+
+bundler_args: --without development
+
+before_script:
+  - cp config/database.yml.travis config/database.yml
+  - psql -c 'create database travis_ci_test;' -U postgres
+  - bundle exec rails db:create
+  - bundle exec rails db:migrate
+
+install:
+  - bundle install
+  - nvm install node
+  - node -v
+  - npm i -g yarn
+  - yarn
+
+script:
+ - bundle exec rails webpacker:compile
+ - bundle exec rake
+
+services:
+  - postgresql
+
+rvm:
+  - 2.7
