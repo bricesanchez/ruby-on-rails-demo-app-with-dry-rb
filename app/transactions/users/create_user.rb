@@ -15,6 +15,8 @@ module Users
 
     def persist(result)
       Success(User.create!(result.values))
+    rescue ::Exception => e
+      Failure(e.message)
     end
   end
 end
